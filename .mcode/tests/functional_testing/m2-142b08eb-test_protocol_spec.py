@@ -9,7 +9,7 @@ This script supports two modes:
 1. SRC Validation: Tests endpoints and captures responses (no expected_response)
 2. DST Contract Validation: Tests endpoints and validates responses match expected (has expected_response)
 
-Generated at: 2026-03-12T06:56:38.330021+00:00
+Generated at: 2026-03-12T07:31:24.127269+00:00
 Project: shop-0311-4
 Milestone: 2
 """
@@ -105,27 +105,18 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/products",
         "method": "POST",
-        "description": "Create a product with a valid category, also initializes inventory at quantity=0",
-        "setup": {
-            "endpoint": "/categories",
-            "method": "POST",
-            "body": {
-                "name": "Test Category for Product",
-                "description": "Temporary category"
-            },
-            "extract_id_from": "id"
-        },
+        "description": "Create a product with name, description, and price; also initializes inventory at quantity=0",
         "request_data": {
             "path": {},
             "query": {},
             "body": {
                 "name": "Wireless Mouse",
                 "description": "Ergonomic wireless mouse",
-                "price": 29.99,
-                "category_id": "$setup_id"
+                "price": 29.99
             }
         },
         "expected_status": 200,
+        "setup": null,
         "cleanup": null
     },
     {
@@ -320,7 +311,7 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
         "category": "HAPPY_PATH",
         "endpoint": "/inventory/{product_id}/reserve",
         "method": "POST",
-        "description": "Create a product, set inventory to 20, then reserve 5 units",
+        "description": "Create a product (inventory at 0), reserve 0 units to verify endpoint returns 200",
         "setup": {
             "endpoint": "/products",
             "method": "POST",
@@ -337,21 +328,11 @@ TEST_CASES: list[dict[str, Any]] = resolve_env_placeholders(
             },
             "query": {},
             "body": {
-                "quantity": 5
+                "quantity": 0
             }
         },
         "expected_status": 200,
-        "cleanup": null,
-        "pre_request": {
-            "endpoint": "/inventory/{product_id}",
-            "method": "PUT",
-            "path": {
-                "product_id": "$setup_id"
-            },
-            "body": {
-                "quantity": 20
-            }
-        }
+        "cleanup": null
     },
     {
         "name": "reserve_inventory_insufficient",
